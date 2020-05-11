@@ -34,7 +34,7 @@ def dump_scalar_to_vtk(file,nx,d,Domain,scalar_field):
 
     # Create the dataset.
     sg = tvtk.StructuredGrid(dimensions=x.shape, points=pts)
-    sg.point_data.scalars = scalar_field.ravel()
+    sg.point_data.scalars = scalar_field.T.ravel()
     sg.point_data.scalars.name = 'scalars'
 
     write_data(sg, str(file)+'.vtk')
@@ -72,7 +72,7 @@ def dump_vector_to_vtk(file,nx,d,Domain,vector_field):
 
     # Create the dataset.
     sg = tvtk.StructuredGrid(dimensions=x.shape, points=pts)
-    sg.point_data.vectors = vector_field
+    sg.point_data.vectors = vector_field.T
     sg.point_data.vectors.name = 'velocity'
 
     write_data(sg, str(file)+'.vtk')
