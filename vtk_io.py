@@ -40,7 +40,7 @@ def dump_scalar_to_vtk(file,nx,d,Domain,scalar_field):
     write_data(sg, str(file)+'.vtk')
     return
 
-def dump_vector_to_vtk(file,nx,d,Domain,fields):
+def dump_vector_to_vtk(file,nx,d,Domain,vector_field):
     D = np.zeros(3)
     if (d==2):
         D = np.asarray([Domain[0],Domain[1],1])
