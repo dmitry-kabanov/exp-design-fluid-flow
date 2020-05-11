@@ -7,6 +7,7 @@ from dedalus import public as de
 from dedalus.extras import flow_tools
 import time
 from IPython import display
+import vtk_io as vtk
 
 import logging
 root = logging.root
@@ -20,8 +21,10 @@ Lx, Ly = (2., 1.)
 nx, ny = (192, 96)
 
 # Create bases and domain
-x_basis = de.Fourier('x', nx, interval=(0, Lx), dealias=3/2)
-y_basis = de.Chebyshev('y',ny, interval=(-Ly/2, Ly/2), dealias=3/2)
+dealiasx = 3/2
+dealiasy = 3/2 
+x_basis = de.Fourier('x', nx, interval=(0, Lx), dealias=dealiasx)
+y_basis = de.Chebyshev('y',ny, interval=(-Ly/2, Ly/2), dealias=dealiasy)
 domain = de.Domain([x_basis, y_basis], grid_dtype=np.float64)
 
 Reynolds = 1e4
@@ -102,6 +105,13 @@ while solver.ok:
     if solver.iteration % 10 == 0:
         # Update plot of scalar field
         p.set_array(np.ravel(s['g'][:-1,:-1].T))
+
+        file = "VTK-%d"%solver.iteration
+        nsize = [nx*dealiasy,ny*dealiasy]
+        d = 2
+        dom = [Lx,Ly]
+        vtk.dump_scalar_to_vtk(file,nsize,d,dom,s['g'])
+
         display.clear_output()
         display.display(plt.gcf())
         logger.info('Iteration: %i, Time: %e, dt: %e' %(solver.iteration, solver.sim_time, dt))
