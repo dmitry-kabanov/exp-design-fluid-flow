@@ -4,6 +4,7 @@ from tvtk.api import tvtk, write_data
 import sys
 
 def dump_scalar_to_vtk(file,nx,d,Domain,scalar_field):
+    print(file,nx,d,Domain,scalar_field.shape)
     D = np.zeros(3)
     if (d==2):
         D = np.asarray([Domain[0],Domain[1],1])
@@ -35,7 +36,7 @@ def dump_scalar_to_vtk(file,nx,d,Domain,scalar_field):
     # Create the dataset.
     sg = tvtk.StructuredGrid(dimensions=x.shape, points=pts)
     sg.point_data.scalars = scalar_field.T.ravel()
-    sg.point_data.scalars.name = 'scalars'
+    sg.point_data.scalars.name = 'scalar'
 
     write_data(sg, str(file)+'.vtk')
     return
@@ -45,6 +46,7 @@ def dump_vector_to_vtk(file,nx,d,Domain,vector_field):
     if (d==2):
         D = np.asarray([Domain[0],Domain[1],1])
         nx = np.asarray([nx[0],nx[1],1])
+        vector_field = vector_field[...,np.newaxis]
     if (d==3):
         D = np.asarray([Domain[0],Domain[1],Domain[2]])
         nx = np.asarray([nx[0],nx[1],nx[2]])
@@ -67,12 +69,12 @@ def dump_vector_to_vtk(file,nx,d,Domain,vector_field):
     # requirement of x first, y next and z last.
     pts = pts.transpose(2, 1, 0, 3).copy()
     pts.shape = pts.size // 3, 3
-    vectors = vectors.transpose(2, 1, 0, 3).copy()
-    vectors.shape = vectors.size // 3, 3
+    vector_field = vector_field.transpose(2, 1, 0, 3).copy()
+    vector_field.shape = vector_field.size // 3, 3
 
     # Create the dataset.
     sg = tvtk.StructuredGrid(dimensions=x.shape, points=pts)
-    sg.point_data.vectors = vector_field.T
+    sg.point_data.vectors = vector_field
     sg.point_data.vectors.name = 'velocity'
 
     write_data(sg, str(file)+'.vtk')

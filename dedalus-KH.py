@@ -22,7 +22,7 @@ nx, ny = (192, 96)
 
 # Create bases and domain
 dealiasx = 3/2
-dealiasy = 3/2 
+dealiasy = 3/2
 x_basis = de.Fourier('x', nx, interval=(0, Lx), dealias=dealiasx)
 y_basis = de.Chebyshev('y',ny, interval=(-Ly/2, Ly/2), dealias=dealiasy)
 domain = de.Domain([x_basis, y_basis], grid_dtype=np.float64)
@@ -85,6 +85,7 @@ cfl.add_velocities(('u','v'))
 analysis = solver.evaluator.add_file_handler('analysis_tasks', sim_dt=0.1, max_writes=50)
 analysis.add_task('s')
 analysis.add_task('u')
+analysis.add_task('v')
 solver.evaluator.vars['Lx'] = Lx
 analysis.add_task("integ(s,'x')/Lx", name='s profile')
 
@@ -105,12 +106,6 @@ while solver.ok:
     if solver.iteration % 10 == 0:
         # Update plot of scalar field
         p.set_array(np.ravel(s['g'][:-1,:-1].T))
-
-        file = "VTK-%d"%solver.iteration
-        nsize = [nx*dealiasy,ny*dealiasy]
-        d = 2
-        dom = [Lx,Ly]
-        vtk.dump_scalar_to_vtk(file,nsize,d,dom,s['g'])
 
         display.clear_output()
         display.display(plt.gcf())
