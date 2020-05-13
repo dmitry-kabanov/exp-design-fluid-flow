@@ -18,11 +18,12 @@ def mu_1g():
     grad_1_phi = derive_by_array(phi,[x,y])
     grad_1_phi
     interface = 0.5*tensorcontraction(tensorproduct(grad_1_phi,grad_1_phi),(0, 1))
-    potential_CH = (phi**2)*(1-phi)**2+interface
+    potential_CH = (phi**2)*(1-phi)**2
     potential_CH
-    chemical_potential_CH = euler_equations(potential_CH,[phi,gradient_1_phi],[x,y,t])
-    chemical_potential_CH
-    mu_CH = str(chemical_potential_CH[0])
+    regularizers_CH = euler_equations(interface,[phi,gradient_1_phi],[x,y,t])
+    regularizers_CH
+    mu_CH_b = str(- potential_CH.diff(phi))
+    mu_CH_i = str(regularizers_CH[0])
 
     old = []
     old.append("Derivative(phi(x, y, t), (x, 2))")
@@ -36,9 +37,10 @@ def mu_1g():
     add_eq = 'dy(s) - sy = 0'
 
     for i in range(len(old)):
-        mu_CH = mu_CH.replace(old[i],new[i])
-    mu_CH = mu_CH.replace("Eq(","")
-    mu_CH = mu_CH.replace(", 0)"," - mu = 0")
+        mu_CH_b = mu_CH_b.replace(old[i],new[i])
+        mu_CH_i = mu_CH_i.replace(old[i],new[i])
+    mu_CH_i = mu_CH_i.replace("Eq(","")
+    mu_CH = mu_CH_i.replace(", 0)"," - mu = ")+mu_CH_b
     return mu_CH
 
 #---------------------––––––---------------------------------------------------#
@@ -58,9 +60,10 @@ def mu_2g():
     interface = tensorcontraction(tensorproduct(grad_1_phi,grad_1_phi), (0, 1))\
         -0.5*tensorcontraction(tensorproduct(grad_2_phi,grad_2_phi),(0,1,2,3))
     potential_PFC = (phi**2)*(1-phi)**2+interface
-    chemical_potential_PFC = euler_equations(potential_PFC, [phi,gradient_1_phi,gradient_2_phi], [x,y,t])
-    chemical_potential_PFC
-    mu_PFC = str(chemical_potential_PFC[0])
+    regularizers_PFC = euler_equations(potential_PFC, [phi,gradient_1_phi,gradient_2_phi], [x,y,t])
+    regularizers_PFC
+    mu_PFC_b = str(- potential_PFC.diff(phi))
+    mu_PFC_i = str(regularizers_PFC[0])
 
     old = []
     old.append("Derivative(phi(x, y, t), (x, 2))")
@@ -78,7 +81,8 @@ def mu_2g():
     add_eq = 'dy(s) - sy = 0'
 
     for i in range(len(old)):
-        mu_PFC = mu_PFC.replace(old[i],new[i])
-    mu_PFC = mu_PFC.replace("Eq(","")
-    mu_PFC = mu_PFC.replace(", 0)"," - mu = 0")
+        mu_PFC_b = mu_PFC_b.replace(old[i],new[i])
+        mu_PFC_i = mu_PFC_i.replace(old[i],new[i])
+    mu_PFC_i = mu_PFC_i.replace("Eq(","")
+    mu_PFC = mu_PFC_i.replace(", 0)"," - mu = ")+mu_PFC_b
     return mu_PFC
