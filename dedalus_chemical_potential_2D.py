@@ -41,7 +41,7 @@ problem.parameters['Lb'] = Lb
 problem.add_equation("dt(s) - 1/Lp*(dx(dx(mu)) + dy(muy)) = 0")
 problem.add_equation("muy - dy(mu) = 0")
 problem.add_equation("sy - dy(s) = 0")
-problem.add_equation(mu_1g())
+problem.add_equation(mu_1g(La,Lb))
 
 problem.add_bc("left(s) = 0")
 problem.add_bc("right(s) = 1")
@@ -69,6 +69,7 @@ initial_dt = Lx/nx
 
 analysis = solver.evaluator.add_file_handler('analysis_tasks', sim_dt=0.1, max_writes=50)
 analysis.add_task('s')
+analysis.add_task('mu')
 solver.evaluator.vars['Lx'] = Lx
 
 # Make plot of scalar field
@@ -105,16 +106,4 @@ logger.info('Iterations: %i' %solver.iteration)
 f = h5py.File('analysis_tasks/analysis_tasks_s1/analysis_tasks_s1_p0.h5','r')
 y = f['/scales/y/1.0'][:]
 t = f['scales']['sim_time'][:]
-s_ave = f['tasks']['s profile'][:]
 f.close()
-
-s_ave = s_ave[:,0,:] # remove length-one x dimension
-
-for i in range(0,21,5):
-  plt.plot(s_ave[i,:],y,label='t=%4.2f' %t[i])
-
-plt.ylim([-0.5,0.5])
-plt.xlim([0,1])
-plt.xlabel(r'$\frac{\int \ s dx}{L_x}$',fontsize=24)
-plt.ylabel(r'$y$',fontsize=24)
-plt.legend(loc='lower right').draw_frame(False)
