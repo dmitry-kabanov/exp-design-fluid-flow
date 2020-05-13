@@ -9,7 +9,7 @@ import time
 from IPython import display
 import vtk_io as vtk
 
-from chemical_potential_CH import mu_1g
+from chemical_potential_2D import mu_1g
 
 import logging
 root = logging.root
@@ -37,7 +37,7 @@ problem.parameters['Sc'] = Schmidt
 problem.add_equation("dt(s) - 1/Sc*(dx(dx(mu)) + dy(muy)) = 0")
 problem.add_equation("muy - dy(mu) = 0")
 problem.add_equation("sy - dy(s) = 0")
-problem.add_equation(mu_eq = mu_1g())
+problem.add_equation(mu_1g())
 
 problem.add_bc("left(s) = 0")
 problem.add_bc("right(s) = 1")
