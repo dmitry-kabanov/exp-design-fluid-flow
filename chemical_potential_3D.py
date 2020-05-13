@@ -40,8 +40,8 @@ def mu_1g():
 
     for i in range(len(old)):
         mu_CH = mu_CH.replace(old[i],new[i])
-    mu_CH = mu_CH.replace("Eq(","mu = ")
-    mu_CH = mu_CH.replace(", 0)","")
+    mu_CH = mu_CH.replace("Eq(","")
+    mu_CH = mu_CH.replace(", 0)"," - mu = 0")
     return mu_CH
 
 #---------------------––––––---------------------------------------------------#
@@ -87,6 +87,6 @@ def mu_2g():
 
     for i in range(len(old)):
         mu_PFC = mu_PFC.replace(old[i],new[i])
-    mu_PFC = mu_PFC.replace("Eq(","mu = ")
-    mu_PFC = mu_PFC.replace(", 0)","")
+    mu_PFC = mu_PFC.replace("Eq(","")
+    mu_PFC = mu_PFC.replace(", 0)"," - mu = 0")
     return mu_PFC
