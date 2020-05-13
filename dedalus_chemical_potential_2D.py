@@ -56,6 +56,8 @@ x = domain.grid(0)
 y = domain.grid(1)
 s = solver.state['s']
 sy = solver.state['sy']
+mu = solver.state['mu']
+muy = solver.state['muy']
 
 a = 0.05
 s['g'] = 0.5*(1+np.tanh(y/a))
