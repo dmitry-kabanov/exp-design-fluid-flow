@@ -1,4 +1,14 @@
 #%matplotlib inline
+'''
+Run the simulation on 4 processors
+    $ mpiexec -n 4 python3 mass_trasnfer_1d.py
+Merge the results into a single analysis_tasks_s$.h5 
+    $ mpiexec -n 4 python3 -m dedalus merge_procs analysis_tasks
+Copy an analysis_tasks_s$.h5 file as restart.h5 in the folder /analysis_tasks to restart the simulation 
+    $ cd /analysis_tasks; cp analysis_tasks_s$.h5 restart.h5; cd ../
+Run the simulation again to restart it
+    $ mpiexec -n 4 python3 mass_trasnfer_1d.py
+'''
 
 import numpy as np
 import matplotlib.pyplot as plt
@@ -8,6 +18,7 @@ from dedalus.extras import flow_tools
 import time
 from IPython import display
 import vtk_io as vtk
+import pathlib
 
 from chemical_potential_2D import mu_1g
 
@@ -52,27 +63,44 @@ ts = de.timesteppers.RK443
 
 solver =  problem.build_solver(ts)
 
-x = domain.grid(0)
-y = domain.grid(1)
-s = solver.state['s']
-sy = solver.state['sy']
-mu = solver.state['mu']
-muy = solver.state['muy']
+# Initial conditions or restart
+print(pathlib.Path)
+if not pathlib.Path('./analysis_tasks/restart.h5').exists():
+    
+    x = domain.grid(0)    
+    y = domain.grid(1)    
+    s = solver.state['s']    
+    sy = solver.state['sy']    
+    mu = solver.state['mu']    
+    muy = solver.state['muy']    
 
-a = 0.05
-s['g'] = 0.5*(1+np.tanh(y/a))
-s.differentiate('y',out=sy)
+    a = 0.05    
+    s['g'] = 0.5*(1+np.tanh(y/a))    
+    s.differentiate('y',out=sy)    
 
-solver.stop_sim_time = 2.01
-solver.stop_wall_time = np.inf
-solver.stop_iteration = np.inf
+    stop_sim_time  = 2.01    
+    stop_wall_time = np.inf    
+    stop_iteration = np.inf    
 
-initial_dt = Lx/nx
+    initial_dt = Lx/nx
+    fh_mode = 'overwrite'
 
-analysis = solver.evaluator.add_file_handler('analysis_tasks', sim_dt=0.1, max_writes=50)
-analysis.add_task('s')
-analysis.add_task('mu')
-solver.evaluator.vars['Lx'] = Lx
+else:
+    # Restart
+    write, last_dt = solver.load_state('./analysis_tasks/restart.h5', -1)
+
+    # Timestepping and output
+    print(last_dt)
+    initial_dt = last_dt
+    stop_sim_time  = 5.01    
+    stop_wall_time = np.inf    
+    stop_iteration = np.inf  
+    fh_mode = 'append'
+    s = solver.state['s'] 
+
+solver.stop_sim_time  = stop_sim_time
+solver.stop_wall_time = stop_wall_time
+solver.stop_iteration = stop_iteration
 
 # Make plot of scalar field
 x = domain.grid(0,scales=domain.dealias)
@@ -82,6 +110,10 @@ fig, axis = plt.subplots(figsize=(10,5))
 p = axis.pcolormesh(xm, ym, s['g'].T, cmap='RdBu_r');
 axis.set_xlim([0,2.])
 axis.set_ylim([-0.5,0.5])
+
+analysis = solver.evaluator.add_file_handler('analysis_tasks', sim_dt=0.1, max_writes=50, mode=fh_mode)
+analysis.add_system(solver.state)
+solver.evaluator.vars['Lx'] = Lx
 
 logger.info('Starting loop')
 start_time = time.time()
