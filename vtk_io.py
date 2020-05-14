@@ -9,7 +9,7 @@ def dump_scalar_to_vtk(file,nx,d,Domain,scalar_field):
     if (d==2):
         D = np.asarray([Domain[0],Domain[1],1])
         nx = np.asarray([nx[0],nx[1],1])
-        scalar_field = scalar_field[...,np.newaxis]
+        scalar_field = scalar_field[:,:,np.newaxis]
     if (d==3):
         D = np.asarray([Domain[0],Domain[1],Domain[2]])
         nx = np.asarray([nx[0],nx[1],nx[2]])
@@ -46,6 +46,7 @@ def dump_vector_to_vtk(file,nx,d,Domain,vector_field):
     if (d==2):
         D = np.asarray([Domain[0],Domain[1],1])
         nx = np.asarray([nx[0],nx[1],1])
+        vector_field = vector_field[:,:,np.newaxis,:]
     if (d==3):
         D = np.asarray([Domain[0],Domain[1],Domain[2]])
         nx = np.asarray([nx[0],nx[1],nx[2]])
@@ -68,6 +69,7 @@ def dump_vector_to_vtk(file,nx,d,Domain,vector_field):
     # requirement of x first, y next and z last.
     pts = pts.transpose(2, 1, 0, 3).copy()
     pts.shape = pts.size // 3, 3
+    print('...',vector_field.transpose(2, 1, 0, 3).shape,vector_field.shape)
     vector_field = vector_field.transpose(2, 1, 0, 3).copy()
     vector_field.shape = vector_field.size // 3, 3
 

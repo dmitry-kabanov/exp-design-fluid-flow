@@ -27,12 +27,12 @@ x_basis = de.Fourier('x', nx, interval=(0, Lx), dealias=dealiasx)
 y_basis = de.Chebyshev('y',ny, interval=(-Ly/2, Ly/2), dealias=dealiasy)
 domain = de.Domain([x_basis, y_basis], grid_dtype=np.float64)
 
-Schmidt = 1.e3
+Lp = 1.e3
 
 problem = de.IVP(domain, variables=['s','sy'])
 problem.meta[:]['y']['dirichlet'] = True
-problem.parameters['Sc'] = Schmidt
-problem.add_equation("dt(s) - 1/Sc*(dx(dx(s)) + dy(sy)) = 0")
+problem.parameters['Lp'] = Lp
+problem.add_equation("dt(s) - 1/Lp*(dx(dx(s)) + dy(sy)) = 0")
 problem.add_equation("sy - dy(s) = 0")
 
 problem.add_bc("left(s) = 0")
