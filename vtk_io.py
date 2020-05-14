@@ -46,7 +46,6 @@ def dump_vector_to_vtk(file,nx,d,Domain,vector_field):
     if (d==2):
         D = np.asarray([Domain[0],Domain[1],1])
         nx = np.asarray([nx[0],nx[1],1])
-        vector_field = vector_field[...,np.newaxis]
     if (d==3):
         D = np.asarray([Domain[0],Domain[1],Domain[2]])
         nx = np.asarray([nx[0],nx[1],nx[2]])
