@@ -20,7 +20,7 @@ from IPython import display
 import vtk_io as vtk
 import pathlib
 
-from chemical_potential_2D import mu_1g
+from chemical_potential_2D import mu_2g
 
 import logging
 root = logging.root
@@ -43,7 +43,8 @@ domain = de.Domain([x_basis, y_basis], grid_dtype=np.float64)
 
 Lp = 1.e3
 La = 1.0
-Lb = 1.0e-3
+Lb = 1.0
+Lc = 1.0
 
 problem = de.IVP(domain, variables=['s','sy','mu','muy'])
 problem.meta[:]['y']['dirichlet'] = True
@@ -54,7 +55,8 @@ problem.parameters['dim'] = dim
 problem.add_equation("dt(s) - 1/Lp*(dx(dx(mu)) + dy(muy)) = 0")
 problem.add_equation("muy - dy(mu) = 0")
 problem.add_equation("sy - dy(s) = 0")
-problem.add_equation(mu_1g(La,Lb))
+problem.add_equation(mu_2g(La,Lb,Lc))
+mu_2g(La,Lb,Lc)
 
 problem.add_bc("left(s) = 0")
 problem.add_bc("right(s) = 1")
@@ -119,6 +121,7 @@ solver.evaluator.vars['Lx'] = Lx
 
 analysis.add_task('La')
 analysis.add_task('Lb')
+analysis.add_task('Lc')
 analysis.add_task('nx')
 analysis.add_task('ny')
 analysis.add_task('Lx')
