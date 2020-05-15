@@ -50,6 +50,10 @@ problem.meta[:]['y']['dirichlet'] = True
 problem.parameters['Lp'] = Lp
 problem.parameters['La'] = La
 problem.parameters['Lb'] = Lb
+problem.parameters['nx'] = nx
+problem.parameters['ny'] = ny
+problem.parameters['Lx'] = Lx
+problem.parameters['Ly'] = Ly
 problem.parameters['dim'] = dim
 problem.add_equation("dt(s) - 1/Lp*(dx(dx(mu)) + dy(muy)) = 0")
 problem.add_equation("muy - dy(mu) = 0")
@@ -115,7 +119,7 @@ axis.set_ylim([-0.5,0.5])
 
 analysis = solver.evaluator.add_file_handler('analysis_tasks', sim_dt=0.1, max_writes=50, mode=fh_mode)
 analysis.add_system(solver.state)
-solver.evaluator.vars['Lx'] = Lx
+# solver.evaluator.vars['Lx'] = Lx
 
 analysis.add_task('La')
 analysis.add_task('Lb')
