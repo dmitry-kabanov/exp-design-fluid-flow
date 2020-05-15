@@ -2,9 +2,9 @@
 '''
 Run the simulation on 4 processors
     $ mpiexec -n 4 python3 mass_trasnfer_1d.py
-Merge the results into a single analysis_tasks_s$.h5 
+Merge the results into a single analysis_tasks_s$.h5 is done at the end of this script, no need for
     $ mpiexec -n 4 python3 -m dedalus merge_procs analysis_tasks
-Copy an analysis_tasks_s$.h5 file as restart.h5 in the folder /analysis_tasks to restart the simulation 
+Copy an analysis_tasks_s$.h5 file as restart.h5 in the folder /analysis_tasks to restart the simulation
     $ cd /analysis_tasks; cp analysis_tasks_s$.h5 restart.h5; cd ../
 Run the simulation again to restart it
     $ mpiexec -n 4 python3 mass_trasnfer_1d.py
@@ -66,21 +66,21 @@ solver =  problem.build_solver(ts)
 # Initial conditions or restart
 print(pathlib.Path)
 if not pathlib.Path('./analysis_tasks/restart.h5').exists():
-    
-    x = domain.grid(0)    
-    y = domain.grid(1)    
-    s = solver.state['s']    
-    sy = solver.state['sy']    
-    mu = solver.state['mu']    
-    muy = solver.state['muy']    
 
-    a = 0.05    
-    s['g'] = 0.5*(1+np.tanh(y/a))    
-    s.differentiate('y',out=sy)    
+    x = domain.grid(0)
+    y = domain.grid(1)
+    s = solver.state['s']
+    sy = solver.state['sy']
+    mu = solver.state['mu']
+    muy = solver.state['muy']
 
-    stop_sim_time  = 2.01    
-    stop_wall_time = np.inf    
-    stop_iteration = np.inf    
+    a = 0.05
+    s['g'] = 0.5*(1+np.tanh(y/a))
+    s.differentiate('y',out=sy)
+
+    stop_sim_time  = 2.01
+    stop_wall_time = np.inf
+    stop_iteration = np.inf
 
     initial_dt = Lx/nx
     fh_mode = 'overwrite'
@@ -92,11 +92,11 @@ else:
     # Timestepping and output
     print(last_dt)
     initial_dt = last_dt
-    stop_sim_time  = 5.01    
-    stop_wall_time = np.inf    
-    stop_iteration = np.inf  
+    stop_sim_time  = 5.01
+    stop_wall_time = np.inf
+    stop_iteration = np.inf
     fh_mode = 'append'
-    s = solver.state['s'] 
+    s = solver.state['s']
 
 solver.stop_sim_time  = stop_sim_time
 solver.stop_wall_time = stop_wall_time
