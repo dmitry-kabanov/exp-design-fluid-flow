@@ -15,6 +15,7 @@ import matplotlib.pyplot as plt
 import h5py
 from dedalus import public as de
 from dedalus.extras import flow_tools
+from dedalus.tools  import post
 import time
 from IPython import display
 import vtk_io as vtk
@@ -32,6 +33,7 @@ logger = logging.getLogger(__name__)
 #Aspect ratio 2
 Lx, Ly = (2., 1.)
 nx, ny = (192, 96)
+dim = 2
 
 # Create bases and domain
 dealiasx = 3/2
@@ -46,9 +48,14 @@ Lb = 1.0e-3
 
 problem = de.IVP(domain, variables=['s','sy','mu','muy'])
 problem.meta[:]['y']['dirichlet'] = True
-problem.parameters['Lp'] = Lp
-problem.parameters['La'] = La
-problem.parameters['Lb'] = Lb
+problem.parameters['Lp']  = Lp
+problem.parameters['La']  = La
+problem.parameters['Lb']  = Lb
+problem.parameters['nx']  = nx
+problem.parameters['ny']  = ny
+problem.parameters['Lx']  = Lx
+problem.parameters['Ly']  = Ly
+problem.parameters['dim'] = dim
 problem.add_equation("dt(s) - 1/Lp*(dx(dx(mu)) + dy(muy)) = 0")
 problem.add_equation("muy - dy(mu) = 0")
 problem.add_equation("sy - dy(s) = 0")
@@ -102,6 +109,17 @@ solver.stop_sim_time  = stop_sim_time
 solver.stop_wall_time = stop_wall_time
 solver.stop_iteration = stop_iteration
 
+analysis = solver.evaluator.add_file_handler('analysis_tasks', sim_dt=0.1, max_writes=50, mode=fh_mode)
+analysis.add_system(solver.state)
+analysis.add_task('La')
+analysis.add_task('Lb')
+analysis.add_task('Lp')
+analysis.add_task('nx')
+analysis.add_task('ny')
+analysis.add_task('Lx')
+analysis.add_task('Ly')
+analysis.add_task('dim')
+
 # Make plot of scalar field
 x = domain.grid(0,scales=domain.dealias)
 y = domain.grid(1,scales=domain.dealias)
@@ -110,10 +128,6 @@ fig, axis = plt.subplots(figsize=(10,5))
 p = axis.pcolormesh(xm, ym, s['g'].T, cmap='RdBu_r');
 axis.set_xlim([0,2.])
 axis.set_ylim([-0.5,0.5])
-
-analysis = solver.evaluator.add_file_handler('analysis_tasks', sim_dt=0.1, max_writes=50, mode=fh_mode)
-analysis.add_system(solver.state)
-solver.evaluator.vars['Lx'] = Lx
 
 logger.info('Starting loop')
 start_time = time.time()
@@ -132,12 +146,12 @@ end_time = time.time()
 
 p.set_array(np.ravel(s['g'][:-1,:-1].T))
 display.clear_output()
+
 # Print statistics
 logger.info('Run time: %f' %(end_time-start_time))
 logger.info('Iterations: %i' %solver.iteration)
 
-# Read in the data
-f = h5py.File('analysis_tasks/analysis_tasks_s1/analysis_tasks_s1_p0.h5','r')
-y = f['/scales/y/1.0'][:]
-t = f['scales']['sim_time'][:]
-f.close()
+# Merge output
+logger.info('beginning join operation')
+logger.info(analysis.base_path)
+post.merge_analysis(analysis.base_path)
