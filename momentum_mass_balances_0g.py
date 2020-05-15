@@ -19,7 +19,7 @@ logger = logging.getLogger(__name__)
 
 #Aspect ratio 2
 Lx, Ly = (2., 1.)
-nx, ny = (192, 96) 
+nx, ny = (192, 96)
 dim = 2
 
 # Create bases and domain
@@ -93,9 +93,6 @@ analysis = solver.evaluator.add_file_handler('analysis_tasks',sim_dt=0.1, max_wr
 analysis.add_task('s')
 analysis.add_task('u')
 analysis.add_task('v')
-#solver.evaluator.vars['Lx'] = Lx
-analysis.add_task("integ(s,'x')/Lx", name='s profile')
-
 analysis.add_task('Re')
 analysis.add_task('Sc')
 analysis.add_task('nx')
