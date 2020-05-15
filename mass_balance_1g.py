@@ -149,9 +149,3 @@ display.clear_output()
 # Print statistics
 logger.info('Run time: %f' %(end_time-start_time))
 logger.info('Iterations: %i' %solver.iteration)
-
-# Read in the data
-f = h5py.File('analysis_tasks/analysis_tasks_s1/analysis_tasks_s1_p0.h5','r')
-y = f['/scales/y/1.0'][:]
-t = f['scales']['sim_time'][:]
-f.close()
