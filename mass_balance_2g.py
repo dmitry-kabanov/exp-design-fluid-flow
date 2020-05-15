@@ -30,24 +30,23 @@ for h in root.handlers:
 logger = logging.getLogger(__name__)
 
 #Aspect ratio 2
-Lx, Ly = (2., 1.)
-nx, ny = (192, 96)
+Lx, Ly = (40., 40.)
+nx, ny = (128, 128)
 dim = 2
 
 # Create bases and domain
 dealiasx = 3/2
 dealiasy = 3/2
 x_basis = de.Fourier('x', nx, interval=(0, Lx), dealias=dealiasx)
-y_basis = de.Chebyshev('y',ny, interval=(-Ly/2, Ly/2), dealias=dealiasy)
+y_basis = de.Fourier('y', ny, interval=(0, Ly), dealias=dealiasy)
 domain = de.Domain([x_basis, y_basis], grid_dtype=np.float64)
 
-Lp = 1.e3
+Lp = 1.0
 La = 1.0
 Lb = 1.0
 Lc = 1.0
 
 problem = de.IVP(domain, variables=['s','sy','mu','muy'])
-problem.meta[:]['y']['dirichlet'] = True
 problem.parameters['Lp'] = Lp
 problem.parameters['La'] = La
 problem.parameters['Lb'] = Lb
@@ -61,11 +60,6 @@ problem.add_equation("dt(s) - 1/Lp*(dx(dx(mu)) + dy(muy)) = 0")
 problem.add_equation("muy - dy(mu) = 0")
 problem.add_equation("sy - dy(s) = 0")
 problem.add_equation(mu_2g(La,Lb,Lc))
-
-problem.add_bc("left(s) = 0")
-problem.add_bc("right(s) = 1")
-problem.add_bc("left(mu) = 0")
-problem.add_bc("right(mu) = 1")
 
 ts = de.timesteppers.RK443
 
@@ -82,15 +76,14 @@ if not pathlib.Path('./analysis_tasks/restart.h5').exists():
     mu = solver.state['mu']
     muy = solver.state['muy']
 
-    a = 0.05
-    s['g'] = 0.5*(1+np.tanh(y/a))
+    s['g'] = 0.25*np.exp(-((x-Lx/2.0)/4.0)**2-((y-Ly/2.0)/4.0)**2)
     s.differentiate('y',out=sy)
 
-    stop_sim_time  = 2.01
+    stop_sim_time  = 1.0e-3
     stop_wall_time = np.inf
     stop_iteration = np.inf
 
-    initial_dt = Lx/nx
+    initial_dt = 1.0e-7
     fh_mode = 'overwrite'
 
 else:
@@ -114,12 +107,12 @@ solver.stop_iteration = stop_iteration
 x = domain.grid(0,scales=domain.dealias)
 y = domain.grid(1,scales=domain.dealias)
 xm, ym = np.meshgrid(x,y)
-fig, axis = plt.subplots(figsize=(10,5))
+fig, axis = plt.subplots(figsize=(5,5))
 p = axis.pcolormesh(xm, ym, s['g'].T, cmap='RdBu_r');
-axis.set_xlim([0,2.])
-axis.set_ylim([-0.5,0.5])
+axis.set_xlim([0,40])
+axis.set_ylim([0,40])
 
-analysis = solver.evaluator.add_file_handler('analysis_tasks', sim_dt=0.1, max_writes=50, mode=fh_mode)
+analysis = solver.evaluator.add_file_handler('analysis_tasks', iter=100, max_writes=200, mode=fh_mode)
 analysis.add_system(solver.state)
 # solver.evaluator.vars['Lx'] = Lx
 
