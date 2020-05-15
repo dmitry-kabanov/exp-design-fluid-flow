@@ -5,6 +5,7 @@ import matplotlib.pyplot as plt
 import h5py
 from dedalus import public as de
 from dedalus.extras import flow_tools
+from dedalus.tools  import post
 import time
 from IPython import display
 import vtk_io as vtk
@@ -18,7 +19,8 @@ logger = logging.getLogger(__name__)
 
 #Aspect ratio 2
 Lx, Ly = (2., 1.)
-nx, ny = (192, 96)
+nx, ny = (192, 96) 
+dim = 2
 
 # Create bases and domain
 dealiasx = 3/2
@@ -32,8 +34,13 @@ Schmidt = 1.
 
 problem = de.IVP(domain, variables=['p','u','v','uy','vy','s','sy'])
 problem.meta[:]['y']['dirichlet'] = True
-problem.parameters['Re'] = Reynolds
-problem.parameters['Sc'] = Schmidt
+problem.parameters['Re']  = Reynolds
+problem.parameters['Sc']  = Schmidt
+problem.parameters['nx']  = nx
+problem.parameters['ny']  = ny
+problem.parameters['Lx']  = Lx
+problem.parameters['Ly']  = Ly
+problem.parameters['dim'] = dim
 problem.add_equation("dt(u) + dx(p) - 1/Re*(dx(dx(u)) + dy(uy)) = - u*dx(u) - v*uy")
 problem.add_equation("dt(v) + dy(p) - 1/Re*(dx(dx(v)) + dy(vy)) = - u*dx(v) - v*vy")
 problem.add_equation("dx(u) + vy = 0")
@@ -82,12 +89,20 @@ initial_dt = 0.2*Lx/nx
 cfl = flow_tools.CFL(solver,initial_dt,safety=0.8)
 cfl.add_velocities(('u','v'))
 
-analysis = solver.evaluator.add_file_handler('analysis_tasks', sim_dt=0.1, max_writes=50)
+analysis = solver.evaluator.add_file_handler('analysis_tasks',sim_dt=0.1, max_writes=50)
 analysis.add_task('s')
 analysis.add_task('u')
 analysis.add_task('v')
-solver.evaluator.vars['Lx'] = Lx
+#solver.evaluator.vars['Lx'] = Lx
 analysis.add_task("integ(s,'x')/Lx", name='s profile')
+
+analysis.add_task('Re')
+analysis.add_task('Sc')
+analysis.add_task('nx')
+analysis.add_task('ny')
+analysis.add_task('Lx')
+analysis.add_task('Ly')
+analysis.add_task('dim')
 
 # Make plot of scalar field
 x = domain.grid(0,scales=domain.dealias)
@@ -127,12 +142,16 @@ s_ave = f['tasks']['s profile'][:]
 f.close()
 
 s_ave = s_ave[:,0,:] # remove length-one x dimension
-
 for i in range(0,21,5):
-  plt.plot(s_ave[i,:],y,label='t=%4.2f' %t[i])
+    plt.plot(s_ave[i,:],y,label='t=%4.2f' %t[i])
 
 plt.ylim([-0.5,0.5])
 plt.xlim([0,1])
 plt.xlabel(r'$\frac{\int \ s dx}{L_x}$',fontsize=24)
 plt.ylabel(r'$y$',fontsize=24)
 plt.legend(loc='lower right').draw_frame(False)
+
+# Merge output
+logger.info('beginning join operation')
+logger.info(analysis.base_path)
+post.merge_analysis(analysis.base_path)
