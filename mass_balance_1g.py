@@ -129,18 +129,6 @@ p = axis.pcolormesh(xm, ym, s['g'].T, cmap='RdBu_r');
 axis.set_xlim([0,2.])
 axis.set_ylim([-0.5,0.5])
 
-analysis = solver.evaluator.add_file_handler('analysis_tasks', sim_dt=0.1, max_writes=50, mode=fh_mode)
-analysis.add_system(solver.state)
-# solver.evaluator.vars['Lx'] = Lx
-
-analysis.add_task('La')
-analysis.add_task('Lb')
-analysis.add_task('nx')
-analysis.add_task('ny')
-analysis.add_task('Lx')
-analysis.add_task('Ly')
-analysis.add_task('dim')
-
 logger.info('Starting loop')
 start_time = time.time()
 while solver.ok:

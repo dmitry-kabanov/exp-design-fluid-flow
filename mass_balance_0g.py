@@ -19,6 +19,7 @@ from dedalus.tools  import post
 import time
 from IPython import display
 import vtk_io as vtk
+import pathlib
 
 import logging
 root = logging.root
@@ -59,20 +60,42 @@ ts = de.timesteppers.RK443
 
 solver =  problem.build_solver(ts)
 
-x = domain.grid(0)
-y = domain.grid(1)
-s = solver.state['s']
-sy = solver.state['sy']
+# Initial conditions or restart
+print(pathlib.Path)
+if not pathlib.Path('./analysis_tasks/restart.h5').exists():
 
-a = 0.05
-s['g'] = 0.5*(1+np.tanh(y/a))
-s.differentiate('y',out=sy)
+    x = domain.grid(0)
+    y = domain.grid(1)
+    s = solver.state['s']
+    sy = solver.state['sy']
+    
+    a = 0.05
+    s['g'] = 0.5*(1+np.tanh(y/a))
+    s.differentiate('y',out=sy)
+    
+    solver.stop_sim_time = 2.01
+    solver.stop_wall_time = np.inf
+    solver.stop_iteration = np.inf
+    
+    initial_dt = Lx/nx
+    fh_mode = 'overwrite'
 
-solver.stop_sim_time = 2.01
-solver.stop_wall_time = np.inf
-solver.stop_iteration = np.inf
+else:
+    # Restart
+    write, last_dt = solver.load_state('./analysis_tasks/restart.h5', -1)
 
-initial_dt = Lx/nx
+    # Timestepping and output
+    print(last_dt)
+    initial_dt = last_dt
+    stop_sim_time  = 5.01
+    stop_wall_time = np.inf
+    stop_iteration = np.inf
+    fh_mode = 'append'
+    s = solver.state['s']
+
+solver.stop_sim_time  = stop_sim_time
+solver.stop_wall_time = stop_wall_time
+solver.stop_iteration = stop_iteration
 
 analysis = solver.evaluator.add_file_handler('analysis_tasks', sim_dt=0.1, max_writes=50)
 analysis.add_task('s')

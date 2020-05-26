@@ -15,6 +15,7 @@ import matplotlib.pyplot as plt
 import h5py
 from dedalus import public as de
 from dedalus.extras import flow_tools
+from dedalus.tools  import post
 import time
 from IPython import display
 import vtk_io as vtk
@@ -103,19 +104,8 @@ solver.stop_sim_time  = stop_sim_time
 solver.stop_wall_time = stop_wall_time
 solver.stop_iteration = stop_iteration
 
-# Make plot of scalar field
-x = domain.grid(0,scales=domain.dealias)
-y = domain.grid(1,scales=domain.dealias)
-xm, ym = np.meshgrid(x,y)
-fig, axis = plt.subplots(figsize=(5,5))
-p = axis.pcolormesh(xm, ym, s['g'].T, cmap='RdBu_r');
-axis.set_xlim([0,40])
-axis.set_ylim([0,40])
-
 analysis = solver.evaluator.add_file_handler('analysis_tasks', iter=100, max_writes=200, mode=fh_mode)
 analysis.add_system(solver.state)
-# solver.evaluator.vars['Lx'] = Lx
-
 analysis.add_task('La')
 analysis.add_task('Lb')
 analysis.add_task('Lc')
@@ -124,6 +114,15 @@ analysis.add_task('ny')
 analysis.add_task('Lx')
 analysis.add_task('Ly')
 analysis.add_task('dim')
+
+# Make plot of scalar field
+x = domain.grid(0,scales=domain.dealias)
+y = domain.grid(1,scales=domain.dealias)
+xm, ym = np.meshgrid(x,y)
+fig, axis = plt.subplots(figsize=(5,5))
+p = axis.pcolormesh(xm, ym, s['g'].T, cmap='RdBu_r');
+axis.set_xlim([0,40])
+axis.set_ylim([0,40])
 
 logger.info('Starting loop')
 start_time = time.time()
@@ -142,6 +141,7 @@ end_time = time.time()
 
 p.set_array(np.ravel(s['g'][:-1,:-1].T))
 display.clear_output()
+
 # Print statistics
 logger.info('Run time: %f' %(end_time-start_time))
 logger.info('Iterations: %i' %solver.iteration)
@@ -151,3 +151,8 @@ f = h5py.File('analysis_tasks/analysis_tasks_s1/analysis_tasks_s1_p0.h5','r')
 y = f['/scales/y/1.0'][:]
 t = f['scales']['sim_time'][:]
 f.close()
+
+# Merge output
+logger.info('beginning join operation')
+logger.info(analysis.base_path)
+post.merge_analysis(analysis.base_path)
