@@ -52,7 +52,6 @@ def mu_2g(La,Lb,Lc):
 
     grad_1_phi = derive_by_array(phi,[x,y])
     grad_2_phi = derive_by_array(grad_1_phi,[x,y])
-    grad_2_phi
     regularizers_PFC_1 = -Lb*tensorcontraction(tensorproduct(grad_1_phi,grad_1_phi), (0, 1))
     regularizers_PFC_2 = +0.5*Lc*tensorcontraction(tensorproduct(grad_2_phi,grad_2_phi),(0,1,2,3))
     potential_PFC = La*((phi**2)*(phi**2-1.0)/4.0+phi**2/2.0)
