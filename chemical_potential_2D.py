@@ -14,9 +14,7 @@ def mu_1g(La,Lb):
 
     phi   = Function('phi')(x,y,t)
     gradient_1_phi = Function('gradient_1_phi')(x,y,t)
-
     grad_1_phi = derive_by_array(phi,[x,y])
-    grad_1_phi
     regularizers_CH = Lb*0.5*tensorcontraction(tensorproduct(grad_1_phi,grad_1_phi),(0, 1))
     potential_CH = La*(phi**2)*(1-phi)**2
     d_regularizers_CH = euler_equations(regularizers_CH,[phi,gradient_1_phi],[x,y,t])
