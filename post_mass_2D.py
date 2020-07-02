@@ -12,5 +12,5 @@ dom = [f['tasks']['Lx'][0],f['tasks']['Ly'][0]]
 nx  = [int(f['tasks']['nx'][0]),int(f['tasks']['ny'][0])]
 for i in range(len(list(ts_))):
     file = '-mass-'+str(i)
-    scalar   = np.asarray(f['tasks']['s'][i])
+    scalar = np.asarray(f['tasks']['s'][i])
     vtk.dump_scalar_to_vtk('s'+file,nx,dim,dom,scalar)
