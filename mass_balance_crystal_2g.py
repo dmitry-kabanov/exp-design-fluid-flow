@@ -33,7 +33,7 @@ logger = logging.getLogger(__name__)
 
 #Aspect ratio 2
 Lx, Ly = (40.0*np.pi/np.sqrt(3.0), 24.0*np.pi)
-nx, ny = (128, 92)
+nx, ny = (92, 92)
 dim = 2
 
 # Create bases and domain
@@ -81,11 +81,11 @@ if not pathlib.Path('./analysis_tasks/restart.h5').exists():
     s['g'] = ic(x,y)
     s.differentiate('y',out=sy)
 
-    stop_sim_time  = 1.0e-3
+    stop_sim_time  = 15.0
     stop_wall_time = np.inf
     stop_iteration = np.inf
 
-    initial_dt = 1.0e-5
+    initial_dt = 1.0e-4
     fh_mode = 'overwrite'
 
 else:
@@ -95,7 +95,7 @@ else:
     # Timestepping and output
     print(last_dt)
     initial_dt = last_dt
-    stop_sim_time  = 5.01
+    stop_sim_time  = 15.0
     stop_wall_time = np.inf
     stop_iteration = np.inf
     fh_mode = 'append'
