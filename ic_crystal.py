@@ -2,7 +2,7 @@ import numpy as np
 
 def ic(x,y):
 
-    eps = 0.25
+    eps = 0.2
     bar_field = np.sqrt(eps)/2.0
     q = np.sqrt(3.0)/2.0
     cx = 10.0*np.pi/q
