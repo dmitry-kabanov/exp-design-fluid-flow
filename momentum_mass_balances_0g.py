@@ -1,13 +1,13 @@
 #%matplotlib inline
 '''
 Run the simulation on 4 processors
-    $ mpiexec -n 4 python3 momentum_mass_balances_0d.py
+    $ mpiexec -n 4 python3 momentum_mass_balances_0g.py
 Merge the results into a single analysis_tasks_s$.h5 is done at the end of this script, no need for
     $ mpiexec -n 4 python3 -m dedalus merge_procs analysis_tasks
 Copy an analysis_tasks_s$.h5 file as restart.h5 in the folder /analysis_tasks to restart the simulation
     $ cd /analysis_tasks; cp analysis_tasks_s$.h5 restart.h5; cd ../
 Run the simulation again to restart it
-    $ mpiexec -n 4 python3 momentum_mass_balances_0d.py
+    $ mpiexec -n 4 python3 momentum_mass_balances_0g.py
 '''
 
 import numpy as np
