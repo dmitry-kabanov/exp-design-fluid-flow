@@ -2,6 +2,7 @@
 import os
 
 import matplotlib.pyplot as plt
+import IPython.display as display
 
 
 def render_figure(fig=None, to_file='figure.pdf', save=False):
@@ -32,4 +33,5 @@ def render_figure(fig=None, to_file='figure.pdf', save=False):
 
         fig.savefig(to_file)
     else:
-        plt.show()
+        display.clear_output()
+        display.display(fig)
