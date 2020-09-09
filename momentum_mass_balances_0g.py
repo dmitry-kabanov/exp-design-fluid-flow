@@ -18,7 +18,8 @@ from dedalus.extras import flow_tools
 from dedalus.tools  import post
 import time
 from IPython import display
-import vtk_io as vtk
+#import vtk_io as vtk
+import util
 
 import logging
 root = logging.root
@@ -127,11 +128,10 @@ while solver.ok:
     solver.step(dt)
     if solver.iteration % 10 == 0:
         # Update plot of scalar field
-        p.set_array(np.ravel(s['g'][:-1,:-1].T))
+        p.set_array(np.ravel(s['g'][:-1, :-1].T))
 
-        display.clear_output()
-        display.display(plt.gcf())
-        logger.info('Iteration: %i, Time: %e, dt: %e' %(solver.iteration, solver.sim_time, dt))
+        util.render_figure(fig=plt.gcf(), to_file='image.pdf', save=True)
+        logger.info('Iteration: %i, Time: %e, dt: %e' % (solver.iteration, solver.sim_time, dt))
 
 end_time = time.time()
 
