@@ -33,5 +33,6 @@ def render_figure(fig=None, to_file='figure.pdf', save=False):
 
         fig.savefig(to_file)
     else:
-        display.clear_output()
-        display.display(fig)
+        # display.clear_output()
+        # display.display(fig)
+        plt.show()
