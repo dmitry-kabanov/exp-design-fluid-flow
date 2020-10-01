@@ -40,6 +40,8 @@ np.random.seed(random_seed)
 idx = np.random.choice(nx*ny, N)
 idx = np.unravel_index(idx, (nx, ny))
 xi, yi = idx
+xp, yp = x_grid[xi], y_grid[yi]
+
 # %% Select measurements finally.
 df = datasets.select_measurements_from_dedalus_sim(
     xi, yi, SIM_DIR, stem=stem
@@ -54,3 +56,22 @@ df = datasets.select_measurements_from_dedalus_sim(
 # ...          ...            ...         ...         ...
 # 20099  20.000457             99   -0.716112    0.002324
 # [20100 rows x 4 columns]
+
+# %% Plotting measurement locations.
+plt.figure()
+plt.scatter(xp, yp)
+plt.xlabel('x')
+plt.ylabel('y')
+plt.tight_layout(pad=0.1)
+plt.show()
+
+# %% Plotting time series for location 0.
+ts_loc_0 = df[df['location_id'] == 0]
+plt.figure()
+plt.plot(ts_loc_0['time'], ts_loc_0['u'], label='u')
+plt.plot(ts_loc_0['time'], ts_loc_0['v'], '--', label='v')
+plt.xlabel('time')
+plt.ylabel('Time series of velocity component')
+plt.legend()
+plt.tight_layout(pad=0.1)
+plt.show()
